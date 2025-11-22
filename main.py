@@ -12,6 +12,7 @@ from logging_config import setup_logging
 from ocr_recognition import detect_enemy_heroes, detect_enemy_items, load_templates
 from recommender import get_recommendations
 from screen_capture import capture_region
+from setup_manager import initialize_application
 from ui import DotaAssistantUI
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,7 @@ class Orchestrator:
 
 def main() -> None:
     setup_logging()
+    initialize_application()
     load_templates()
     if not (ocr_recognition.HERO_TEMPLATES and ocr_recognition.ITEM_TEMPLATES):
         logger.warning(
