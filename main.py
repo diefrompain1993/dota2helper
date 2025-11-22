@@ -119,6 +119,7 @@ class Orchestrator:
 def main() -> None:
     setup_logging()
     initialize_application()
+    logger.info("Loading OCR templates into memory")
     load_templates()
     if not (ocr_recognition.HERO_TEMPLATES and ocr_recognition.ITEM_TEMPLATES):
         logger.warning(

@@ -41,17 +41,20 @@ def _fetch_json(url: str):
         return None
 
 
-def download_image(url: str, path: Path) -> bool:
-    """Download a single image to the given path."""
+def download_image(url: str, path: Path, timeout: int = 15) -> bool:
+    """Download a single image to the given path with timeout and error handling."""
     try:
         logger.debug("Downloading %s -> %s", url, path)
-        with urllib.request.urlopen(url) as response:  # nosec: B310
+        with urllib.request.urlopen(url, timeout=timeout) as response:  # nosec: B310
             data = response.read()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
         return True
     except urllib.error.URLError as exc:  # pragma: no cover - network guard
         logger.warning("Failed to download %s: %s", url, exc)
+        return False
+    except Exception as exc:  # noqa: BLE001 - catch-all for network/IO errors
+        logger.warning("Unexpected failure downloading %s: %s", url, exc)
         return False
 
 
@@ -71,7 +74,7 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
         json.dumps(heroes, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     downloaded = 0
-    for hero in heroes:
+    for idx, hero in enumerate(heroes, start=1):
         name = _hero_name(hero)
         if not name:
             continue
@@ -81,6 +84,8 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
         url = HERO_ICON_URL.format(name=name)
         if download_image(url, dest):
             downloaded += 1
+        if idx % 50 == 0:
+            logger.info("Hero icons progress: %d/%d processed", idx, len(heroes))
     logger.info("Heroes fetched: %d total, %d icons downloaded", len(heroes), downloaded)
     return heroes, downloaded
 
@@ -106,13 +111,15 @@ def download_items() -> Tuple[Dict[str, object], int]:
         json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     downloaded = 0
-    for name, entry in items.items():
+    for idx, (name, entry) in enumerate(items.items(), start=1):
         dest = ITEM_DIR / f"{name}.png"
         if dest.exists():
             continue
         url = _item_image_url(name, entry if isinstance(entry, dict) else {})
         if download_image(url, dest):
             downloaded += 1
+        if idx % 50 == 0:
+            logger.info("Item icons progress: %d/%d processed", idx, len(items))
     logger.info("Items fetched: %d total, %d icons downloaded", len(items), downloaded)
     return items, downloaded
 
@@ -138,6 +145,7 @@ def _download_missing_images(entries: Iterable[Tuple[str, Path, str]]) -> int:
 def update_assets() -> None:
     """Ensure metadata and icons for heroes/items are present, downloading as needed."""
     _ensure_directories()
+    logger.info("Starting asset verification/download")
 
     heroes_path = DATA_DIR / "heroes.json"
     items_path = DATA_DIR / "items.json"

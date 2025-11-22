@@ -130,9 +130,12 @@ def auto_calibrate_regions() -> None:
 
 def initialize_application() -> None:
     """Run one-time setup before the orchestrator/UI start."""
+    logger.info("Starting automated setup (GSI config, regions, assets)")
     install_gsi_config_if_missing()
     auto_calibrate_regions()
+    logger.info("Ensuring Dota 2 heroes/items assets are available (may take a few minutes on first run)")
     update_assets()
+    logger.info("Automated setup complete")
 
 
 __all__ = ["install_gsi_config_if_missing", "auto_calibrate_regions", "initialize_application"]
