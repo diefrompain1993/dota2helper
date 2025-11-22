@@ -37,6 +37,11 @@ def _ensure_directories() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
+DOWNLOAD_TIMEOUT = 4
+DOWNLOAD_RETRIES = 2
+FAIL_FAST_CONSECUTIVE = 20
+
+
 def _fetch_json(url: str):
     logger.debug("Fetching JSON from %s", url)
     try:
@@ -48,7 +53,12 @@ def _fetch_json(url: str):
         return None
 
 
-def download_image(urls: Sequence[str], path: Path, timeout: int = 6, retries: int = 2) -> bool:
+def download_image(
+    urls: Sequence[str],
+    path: Path,
+    timeout: int = DOWNLOAD_TIMEOUT,
+    retries: int = DOWNLOAD_RETRIES,
+) -> bool:
     """Download a single image to the given path with timeout, retries, and fallbacks."""
     for url in urls:
         for attempt in range(1, retries + 1):
@@ -81,6 +91,7 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
         json.dumps(heroes, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     downloaded = 0
+    failure_streak = 0
     for idx, hero in enumerate(heroes, start=1):
         name = _hero_name(hero)
         if not name:
@@ -91,6 +102,15 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
         url_candidates = [template.format(name=name) for template in HERO_ICON_URLS]
         if download_image(url_candidates, dest):
             downloaded += 1
+            failure_streak = 0
+        else:
+            failure_streak += 1
+            if failure_streak >= FAIL_FAST_CONSECUTIVE:
+                logger.warning(
+                    "Network failures reached %d in a row; skipping remaining hero icons.",
+                    failure_streak,
+                )
+                break
         if idx % 50 == 0:
             logger.info("Hero icons progress: %d/%d processed", idx, len(heroes))
     logger.info("Heroes fetched: %d total, %d icons downloaded", len(heroes), downloaded)
@@ -118,6 +138,7 @@ def download_items() -> Tuple[Dict[str, object], int]:
         json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     downloaded = 0
+    failure_streak = 0
     for idx, (name, entry) in enumerate(items.items(), start=1):
         dest = ITEM_DIR / f"{name}.png"
         if dest.exists():
@@ -125,6 +146,15 @@ def download_items() -> Tuple[Dict[str, object], int]:
         url_candidates = _item_image_urls(name, entry if isinstance(entry, dict) else {})
         if download_image(url_candidates, dest):
             downloaded += 1
+            failure_streak = 0
+        else:
+            failure_streak += 1
+            if failure_streak >= FAIL_FAST_CONSECUTIVE:
+                logger.warning(
+                    "Network failures reached %d in a row; skipping remaining item icons.",
+                    failure_streak,
+                )
+                break
         if idx % 50 == 0:
             logger.info("Item icons progress: %d/%d processed", idx, len(items))
     logger.info("Items fetched: %d total, %d icons downloaded", len(items), downloaded)
@@ -138,14 +168,26 @@ def _load_local_json(path: Path):
         return json.load(f)
 
 
-def _download_missing_images(entries: Iterable[Tuple[Sequence[str], Path, str]]) -> int:
+def _download_missing_images(
+    entries: Iterable[Tuple[Sequence[str], Path, str]], fail_fast_limit: int = FAIL_FAST_CONSECUTIVE
+) -> int:
     downloaded = 0
+    failure_streak = 0
     for urls, dest, label in entries:
         if dest.exists():
             continue
         if download_image(urls, dest):
             downloaded += 1
+            failure_streak = 0
             logger.debug("Downloaded missing %s -> %s", label, dest)
+        else:
+            failure_streak += 1
+            if failure_streak >= fail_fast_limit:
+                logger.warning(
+                    "Network failures reached %d in a row while filling missing assets; stopping early.",
+                    failure_streak,
+                )
+                break
     return downloaded
 
 
