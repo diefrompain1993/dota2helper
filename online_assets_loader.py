@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 import logging
-import urllib.error
 import urllib.parse
-import urllib.request
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Sequence, Tuple
+
+import requests
 
 from paths import BASE_PATH
 
@@ -21,8 +21,14 @@ DATA_DIR = ROOT / "data"
 
 HEROES_URL = "https://api.opendota.com/api/heroes"
 ITEMS_URL = "https://api.opendota.com/api/constants/items"
-HERO_ICON_URL = "http://cdn.dota2.com/apps/dota2/images/heroes/{name}_icon.png"
-ITEM_ICON_URL = "http://cdn.dota2.com/apps/dota2/images/items/{name}_lg.png"
+HERO_ICON_URLS = (
+    "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/heroes/{name}_icon.png",
+    "http://cdn.dota2.com/apps/dota2/images/heroes/{name}_icon.png",
+)
+ITEM_ICON_URLS = (
+    "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/{name}_lg.png",
+    "http://cdn.dota2.com/apps/dota2/images/items/{name}_lg.png",
+)
 
 
 def _ensure_directories() -> None:
@@ -34,28 +40,29 @@ def _ensure_directories() -> None:
 def _fetch_json(url: str):
     logger.debug("Fetching JSON from %s", url)
     try:
-        with urllib.request.urlopen(url, timeout=10) as response:  # nosec: B310
-            return json.load(response)
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return resp.json()
     except Exception as exc:  # noqa: BLE001
         logger.error("Failed fetching JSON from %s: %s", url, exc)
         return None
 
 
-def download_image(url: str, path: Path, timeout: int = 15) -> bool:
-    """Download a single image to the given path with timeout and error handling."""
-    try:
-        logger.debug("Downloading %s -> %s", url, path)
-        with urllib.request.urlopen(url, timeout=timeout) as response:  # nosec: B310
-            data = response.read()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-        return True
-    except urllib.error.URLError as exc:  # pragma: no cover - network guard
-        logger.warning("Failed to download %s: %s", url, exc)
-        return False
-    except Exception as exc:  # noqa: BLE001 - catch-all for network/IO errors
-        logger.warning("Unexpected failure downloading %s: %s", url, exc)
-        return False
+def download_image(urls: Sequence[str], path: Path, timeout: int = 6, retries: int = 2) -> bool:
+    """Download a single image to the given path with timeout, retries, and fallbacks."""
+    for url in urls:
+        for attempt in range(1, retries + 1):
+            try:
+                logger.debug("Downloading %s -> %s (attempt %d)", url, path, attempt)
+                resp = requests.get(url, timeout=timeout)
+                resp.raise_for_status()
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(resp.content)
+                return True
+            except Exception as exc:  # noqa: BLE001 - network/IO guard
+                logger.warning("Attempt %d failed for %s: %s", attempt, url, exc)
+    logger.error("All attempts failed for %s", path)
+    return False
 
 
 def _hero_name(hero_entry: Dict[str, object]) -> str:
@@ -81,8 +88,8 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
         dest = HERO_DIR / f"{name}.png"
         if dest.exists():
             continue
-        url = HERO_ICON_URL.format(name=name)
-        if download_image(url, dest):
+        url_candidates = [template.format(name=name) for template in HERO_ICON_URLS]
+        if download_image(url_candidates, dest):
             downloaded += 1
         if idx % 50 == 0:
             logger.info("Hero icons progress: %d/%d processed", idx, len(heroes))
@@ -90,14 +97,14 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
     return heroes, downloaded
 
 
-def _item_image_url(name: str, entry: Dict[str, object]) -> str:
+def _item_image_urls(name: str, entry: Dict[str, object]) -> List[str]:
     img = entry.get("img")
     if isinstance(img, str) and img:
         if img.startswith("http"):
-            return img
+            return [img]
         if img.startswith("/"):
-            return urllib.parse.urljoin("http://cdn.dota2.com", img)
-    return ITEM_ICON_URL.format(name=name)
+            return [urllib.parse.urljoin("http://cdn.dota2.com", img)]
+    return [template.format(name=name) for template in ITEM_ICON_URLS]
 
 
 def download_items() -> Tuple[Dict[str, object], int]:
@@ -115,8 +122,8 @@ def download_items() -> Tuple[Dict[str, object], int]:
         dest = ITEM_DIR / f"{name}.png"
         if dest.exists():
             continue
-        url = _item_image_url(name, entry if isinstance(entry, dict) else {})
-        if download_image(url, dest):
+        url_candidates = _item_image_urls(name, entry if isinstance(entry, dict) else {})
+        if download_image(url_candidates, dest):
             downloaded += 1
         if idx % 50 == 0:
             logger.info("Item icons progress: %d/%d processed", idx, len(items))
@@ -131,12 +138,12 @@ def _load_local_json(path: Path):
         return json.load(f)
 
 
-def _download_missing_images(entries: Iterable[Tuple[str, Path, str]]) -> int:
+def _download_missing_images(entries: Iterable[Tuple[Sequence[str], Path, str]]) -> int:
     downloaded = 0
-    for url, dest, label in entries:
+    for urls, dest, label in entries:
         if dest.exists():
             continue
-        if download_image(url, dest):
+        if download_image(urls, dest):
             downloaded += 1
             logger.debug("Downloaded missing %s -> %s", label, dest)
     return downloaded
@@ -163,11 +170,11 @@ def update_assets() -> None:
                 continue
             dest = HERO_DIR / f"{name}.png"
             if not dest.exists():
-                url = HERO_ICON_URL.format(name=name)
-                missing_hero_jobs.append((url, dest, name))
+                url_candidates = [template.format(name=name) for template in HERO_ICON_URLS]
+                missing_hero_jobs.append((url_candidates, dest, name))
     if missing_hero_jobs:
         fresh_downloads += _download_missing_images(
-            (url, dest, label) for url, dest, label in missing_hero_jobs
+            (urls, dest, label) for urls, dest, label in missing_hero_jobs
         )
 
     items = _load_local_json(items_path)
@@ -180,11 +187,11 @@ def update_assets() -> None:
         for name, entry in items.items():
             dest = ITEM_DIR / f"{name}.png"
             if not dest.exists():
-                url = _item_image_url(name, entry if isinstance(entry, dict) else {})
-                missing_item_jobs.append((url, dest, name))
+                url_candidates = _item_image_urls(name, entry if isinstance(entry, dict) else {})
+                missing_item_jobs.append((url_candidates, dest, name))
     if missing_item_jobs:
         item_downloads += _download_missing_images(
-            (url, dest, label) for url, dest, label in missing_item_jobs
+            (urls, dest, label) for urls, dest, label in missing_item_jobs
         )
 
     # Cleanup stray icons no longer present in metadata
