@@ -22,10 +22,12 @@ DATA_DIR = ROOT / "data"
 HEROES_URL = "https://api.opendota.com/api/heroes"
 ITEMS_URL = "https://api.opendota.com/api/constants/items"
 HERO_ICON_URLS = (
+    "https://cdn.dota2.com/apps/dota2/images/heroes/{name}_icon.png",
     "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/heroes/{name}_icon.png",
     "http://cdn.dota2.com/apps/dota2/images/heroes/{name}_icon.png",
 )
 ITEM_ICON_URLS = (
+    "https://cdn.dota2.com/apps/dota2/images/items/{name}_lg.png",
     "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/{name}_lg.png",
     "http://cdn.dota2.com/apps/dota2/images/items/{name}_lg.png",
 )
@@ -37,9 +39,10 @@ def _ensure_directories() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-DOWNLOAD_TIMEOUT = 4
-DOWNLOAD_RETRIES = 2
-FAIL_FAST_CONSECUTIVE = 20
+DOWNLOAD_TIMEOUT = 3
+DOWNLOAD_RETRIES = 1
+FAIL_FAST_CONSECUTIVE = 5
+MAX_TOTAL_FAILURES = 40
 
 
 def _fetch_json(url: str):
@@ -92,6 +95,7 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
     )
     downloaded = 0
     failure_streak = 0
+    total_failures = 0
     for idx, hero in enumerate(heroes, start=1):
         name = _hero_name(hero)
         if not name:
@@ -105,10 +109,12 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
             failure_streak = 0
         else:
             failure_streak += 1
-            if failure_streak >= FAIL_FAST_CONSECUTIVE:
+            total_failures += 1
+            if failure_streak >= FAIL_FAST_CONSECUTIVE or total_failures >= MAX_TOTAL_FAILURES:
                 logger.warning(
-                    "Network failures reached %d in a row; skipping remaining hero icons.",
+                    "Network failures reached %d in a row (total %d); skipping remaining hero icons.",
                     failure_streak,
+                    total_failures,
                 )
                 break
         if idx % 50 == 0:
@@ -139,6 +145,7 @@ def download_items() -> Tuple[Dict[str, object], int]:
     )
     downloaded = 0
     failure_streak = 0
+    total_failures = 0
     for idx, (name, entry) in enumerate(items.items(), start=1):
         dest = ITEM_DIR / f"{name}.png"
         if dest.exists():
@@ -149,10 +156,12 @@ def download_items() -> Tuple[Dict[str, object], int]:
             failure_streak = 0
         else:
             failure_streak += 1
-            if failure_streak >= FAIL_FAST_CONSECUTIVE:
+            total_failures += 1
+            if failure_streak >= FAIL_FAST_CONSECUTIVE or total_failures >= MAX_TOTAL_FAILURES:
                 logger.warning(
-                    "Network failures reached %d in a row; skipping remaining item icons.",
+                    "Network failures reached %d in a row (total %d); skipping remaining item icons.",
                     failure_streak,
+                    total_failures,
                 )
                 break
         if idx % 50 == 0:
@@ -173,6 +182,7 @@ def _download_missing_images(
 ) -> int:
     downloaded = 0
     failure_streak = 0
+    total_failures = 0
     for urls, dest, label in entries:
         if dest.exists():
             continue
@@ -182,10 +192,12 @@ def _download_missing_images(
             logger.debug("Downloaded missing %s -> %s", label, dest)
         else:
             failure_streak += 1
-            if failure_streak >= fail_fast_limit:
+            total_failures += 1
+            if failure_streak >= fail_fast_limit or total_failures >= MAX_TOTAL_FAILURES:
                 logger.warning(
-                    "Network failures reached %d in a row while filling missing assets; stopping early.",
+                    "Network failures reached %d in a row (total %d) while filling missing assets; stopping early.",
                     failure_streak,
+                    total_failures,
                 )
                 break
     return downloaded
