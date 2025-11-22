@@ -49,13 +49,26 @@ def create_app() -> Flask:
     def ingest_gsi():
         payload = request.get_json(force=True, silent=True) or {}
         logger.debug("Received GSI payload: %s", payload)
-        hero = payload.get("hero") or payload.get("my_hero")
-        items = payload.get("items") or payload.get("my_items")
-        if items is not None and not isinstance(items, list):
-            logger.warning("Invalid items payload type: %s", type(items))
-            return jsonify({"error": "items must be a list"}), 400
-        _state_store.update(hero=hero, items=items)
-        return jsonify({"status": "ok", "hero": hero, "items": items}), 200
+
+        # --- HERO PARSING ---
+        hero_block = payload.get("hero") or {}
+        raw_hero_id = hero_block.get("id") or hero_block.get("name") or ""
+        hero = raw_hero_id.replace("npc_dota_hero_", "")
+
+        # --- ITEM PARSING ---
+        items_block = payload.get("items") or {}
+        parsed_items = []
+        for slot, item_data in items_block.items():
+            if not isinstance(item_data, dict):
+                continue
+            name = item_data.get("name")
+            if not name:
+                continue
+            if name.startswith("item_"):
+                parsed_items.append(name.replace("item_", ""))
+
+        _state_store.update(hero=hero, items=parsed_items)
+        return jsonify({"status": "ok", "hero": hero, "items": parsed_items}), 200
 
     @app.get("/health")
     def health():

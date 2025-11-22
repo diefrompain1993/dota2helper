@@ -9,7 +9,12 @@ from typing import Dict, List
 import ocr_recognition
 from gsi_server import get_my_state, run_server
 from logging_config import setup_logging
-from ocr_recognition import detect_enemy_heroes, detect_enemy_items, load_templates
+from ocr_recognition import (
+    detect_enemy_heroes,
+    detect_enemy_items,
+    load_templates,
+    reset_hash_cache,
+)
 from recommender import get_recommendations
 from screen_capture import capture_region
 from setup_manager import initialize_application
@@ -37,14 +42,20 @@ class Orchestrator:
         enemy_items: Dict[str, List[str]]
         try:
             top_bar = capture_region("top_bar_enemies")
-            enemy_heroes = detect_enemy_heroes(top_bar)
+            if top_bar is not None:
+                enemy_heroes = detect_enemy_heroes(top_bar)
+            else:
+                enemy_heroes = []
         except Exception as exc:  # noqa: BLE001
             logger.warning("Failed to detect enemy heroes: %s", exc)
             enemy_heroes = []
 
         try:
             scoreboard = capture_region("scoreboard_items")
-            enemy_items = detect_enemy_items(scoreboard, enemy_heroes)
+            if scoreboard is not None:
+                enemy_items = detect_enemy_items(scoreboard, enemy_heroes)
+            else:
+                enemy_items = {}
         except Exception as exc:  # noqa: BLE001
             logger.warning("Failed to detect enemy items: %s", exc)
             enemy_items = {}
@@ -62,6 +73,7 @@ class Orchestrator:
             self.cached_data["my_hero"] = my_hero
             self.cached_data["my_items"] = my_items
 
+        reset_hash_cache()
         self._capture_and_detect()
 
         recos = get_recommendations(

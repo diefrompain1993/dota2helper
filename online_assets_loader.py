@@ -9,9 +9,11 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
+from paths import BASE_PATH
+
 logger = logging.getLogger(__name__)
 
-ROOT = Path(__file__).parent
+ROOT = BASE_PATH
 ASSETS_DIR = ROOT / "assets"
 HERO_DIR = ASSETS_DIR / "heroes"
 ITEM_DIR = ASSETS_DIR / "items"
@@ -31,8 +33,12 @@ def _ensure_directories() -> None:
 
 def _fetch_json(url: str):
     logger.debug("Fetching JSON from %s", url)
-    with urllib.request.urlopen(url) as response:  # nosec: B310
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(url, timeout=10) as response:  # nosec: B310
+            return json.load(response)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Failed fetching JSON from %s: %s", url, exc)
+        return None
 
 
 def download_image(url: str, path: Path) -> bool:
@@ -58,6 +64,9 @@ def download_heroes() -> Tuple[List[Dict[str, object]], int]:
     """Download heroes.json and all hero icons."""
     _ensure_directories()
     heroes: List[Dict[str, object]] = _fetch_json(HEROES_URL)
+    if not heroes:
+        logger.warning("Heroes metadata could not be fetched. Using existing local files.")
+        return [], 0
     (DATA_DIR / "heroes.json").write_text(
         json.dumps(heroes, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -90,6 +99,9 @@ def download_items() -> Tuple[Dict[str, object], int]:
     """Download items.json and all item icons."""
     _ensure_directories()
     items: Dict[str, object] = _fetch_json(ITEMS_URL)
+    if not items:
+        logger.warning("Items metadata could not be fetched. Using existing local files.")
+        return {}, 0
     (DATA_DIR / "items.json").write_text(
         json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -166,6 +178,27 @@ def update_assets() -> None:
         item_downloads += _download_missing_images(
             (url, dest, label) for url, dest, label in missing_item_jobs
         )
+
+    # Cleanup stray icons no longer present in metadata
+    hero_valid = {(_hero_name(hero)) for hero in heroes} if heroes else set()
+    for fname in HERO_DIR.glob("*.png"):
+        label = fname.stem
+        if hero_valid and label not in hero_valid:
+            try:
+                fname.unlink()
+                logger.debug("Removed stale hero icon %s", fname)
+            except OSError as exc:  # pragma: no cover - filesystem errors
+                logger.warning("Failed to remove stale hero icon %s: %s", fname, exc)
+
+    item_valid = set(items.keys()) if isinstance(items, dict) else set()
+    for fname in ITEM_DIR.glob("*.png"):
+        label = fname.stem
+        if item_valid and label not in item_valid:
+            try:
+                fname.unlink()
+                logger.debug("Removed stale item icon %s", fname)
+            except OSError as exc:  # pragma: no cover
+                logger.warning("Failed to remove stale item icon %s: %s", fname, exc)
 
     logger.info(
         "Assets ready: heroes=%d (missing downloaded=%d), items=%d (missing downloaded=%d)",

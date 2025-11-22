@@ -8,10 +8,11 @@ from pathlib import Path
 from typing import Optional
 
 from online_assets_loader import update_assets
+from paths import BASE_PATH
 
 logger = logging.getLogger(__name__)
 
-CONFIG_DIR = Path(__file__).parent / "config"
+CONFIG_DIR = BASE_PATH / "config"
 GSI_CFG_PATH = CONFIG_DIR / "gsi_config_example.cfg"
 REGIONS_PATH = CONFIG_DIR / "regions.json"
 

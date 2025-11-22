@@ -6,9 +6,11 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Set
 
+from paths import BASE_PATH
+
 logger = logging.getLogger(__name__)
 
-CONFIG_DIR = Path(__file__).parent / "config"
+CONFIG_DIR = BASE_PATH / "config"
 HERO_TAGS_PATH = CONFIG_DIR / "hero_tags.json"
 TAG_COUNTER_PATH = CONFIG_DIR / "tag_counter_items.json"
 

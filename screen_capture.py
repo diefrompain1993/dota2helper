@@ -5,12 +5,18 @@ import json
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
-from mss import mss
 
-CONFIG_PATH = Path(__file__).parent / "config" / "regions.json"
+from paths import BASE_PATH
+
+try:
+    from mss import mss
+except ImportError as exc:  # pragma: no cover - import guard
+    raise RuntimeError("The 'mss' package is required for screen capture.") from exc
+
+CONFIG_PATH = BASE_PATH / "config" / "regions.json"
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +30,7 @@ def _load_regions() -> Dict[str, Dict[str, int]]:
     return regions
 
 
-def capture_region(region_name: str) -> np.ndarray:
+def capture_region(region_name: str) -> Optional[np.ndarray]:
     """Capture a configured screen region using mss.
 
     Args:
@@ -35,9 +41,14 @@ def capture_region(region_name: str) -> np.ndarray:
     """
     regions = _load_regions()
     if region_name not in regions:
-        raise KeyError(f"Region '{region_name}' not defined in regions.json")
+        logger.error("Region '%s' not found in regions.json", region_name)
+        return None
 
     monitor = regions[region_name]
+    if monitor.get("width", 0) <= 0 or monitor.get("height", 0) <= 0:
+        logger.error("Invalid region size for '%s': %s", region_name, monitor)
+        return None
+
     with mss() as sct:
         screenshot = sct.grab(monitor)
     img = np.array(screenshot)
