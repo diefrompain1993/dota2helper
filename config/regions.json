@@ -1,0 +1,4 @@
+{
+  "top_bar_enemies": {"left": 100, "top": 50, "width": 800, "height": 100},
+  "scoreboard_items": {"left": 200, "top": 200, "width": 1000, "height": 400}
+}
