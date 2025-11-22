@@ -1,10 +1,13 @@
 """Tkinter-based UI to display game state and recommendations."""
 from __future__ import annotations
 
+import logging
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Dict, List
 
+
+logger = logging.getLogger(__name__)
 
 def _list_to_lines(items: List[str]) -> str:
     return "\n".join(items) if items else "—"
@@ -66,6 +69,7 @@ class DotaAssistantUI:
         self.enemy_items_var.set(_enemy_items_to_lines(data.get("enemy_items", {})))
         self.reco_var.set(_list_to_lines(data.get("recommended_items", [])))
         self.expl_var.set(_list_to_lines(data.get("explanations", [])))
+        logger.debug("UI refreshed with snapshot")
         self._schedule_refresh()
 
     def run(self) -> None:

@@ -9,7 +9,6 @@ from typing import Dict, List, Optional
 from flask import Flask, jsonify, request
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -49,9 +48,11 @@ def create_app() -> Flask:
     @app.post("/gsi")
     def ingest_gsi():
         payload = request.get_json(force=True, silent=True) or {}
+        logger.debug("Received GSI payload: %s", payload)
         hero = payload.get("hero") or payload.get("my_hero")
         items = payload.get("items") or payload.get("my_items")
         if items is not None and not isinstance(items, list):
+            logger.warning("Invalid items payload type: %s", type(items))
             return jsonify({"error": "items must be a list"}), 400
         _state_store.update(hero=hero, items=items)
         return jsonify({"status": "ok", "hero": hero, "items": items}), 200
@@ -71,7 +72,11 @@ def get_my_state() -> Dict[str, object]:
 def run_server(host: str = "0.0.0.0", port: int = 4000) -> Thread:
     """Run the Flask GSI server in a background thread."""
     app = create_app()
-    thread = Thread(target=app.run, kwargs={"host": host, "port": port}, daemon=True)
+    thread = Thread(
+        target=app.run,
+        kwargs={"host": host, "port": port, "use_reloader": False},
+        daemon=True,
+    )
     thread.start()
     logger.info("GSI server started on %s:%s", host, port)
     return thread

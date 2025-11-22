@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict
@@ -10,6 +11,8 @@ import numpy as np
 from mss import mss
 
 CONFIG_PATH = Path(__file__).parent / "config" / "regions.json"
+
+logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=1)
@@ -41,6 +44,7 @@ def capture_region(region_name: str) -> np.ndarray:
     # mss returns BGRA; drop alpha channel for OpenCV compatibility
     if img.shape[2] == 4:
         img = img[:, :, :3]
+    logger.debug("Captured region %s with shape %s", region_name, img.shape)
     return img
 
 

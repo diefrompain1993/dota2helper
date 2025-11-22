@@ -1,37 +1,55 @@
 """Rule-based recommender for Dota 2 itemization."""
 from __future__ import annotations
 
+import json
+import logging
+from pathlib import Path
 from typing import Dict, List, Set
 
-HERO_TAGS: Dict[str, List[str]] = {
-    "lion": ["heavy_magic_damage", "hard_disabler"],
-    "shadow_fiend": ["heavy_magic_damage"],
-    "axe": ["initiator", "high_armor_tank"],
-    "phantom_lancer": ["illusion_hero"],
-    "naga_siren": ["illusion_hero"],
-}
+logger = logging.getLogger(__name__)
 
-TAG_COUNTER_ITEMS: Dict[str, List[str]] = {
-    "heavy_magic_damage": ["black_king_bar", "pipe_of_insight"],
-    "hard_disabler": ["black_king_bar", "manta_style", "linken_sphere"],
-    "high_armor_tank": ["desolator", "silver_edge"],
-    "initiator": ["linken_sphere", "black_king_bar"],
-    "illusion_hero": ["battle_fury", "mjollnir", "shivas_guard"],
-}
+CONFIG_DIR = Path(__file__).parent / "config"
+HERO_TAGS_PATH = CONFIG_DIR / "hero_tags.json"
+TAG_COUNTER_PATH = CONFIG_DIR / "tag_counter_items.json"
+
+
+def _load_json(path: Path) -> Dict[str, List[str]]:
+    if not path.exists():
+        logger.warning("Config not found: %s", path)
+        return {}
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+HERO_TAGS: Dict[str, List[str]] = _load_json(HERO_TAGS_PATH)
+TAG_COUNTER_ITEMS: Dict[str, List[str]] = _load_json(TAG_COUNTER_PATH)
+logger.info(
+    "Loaded hero tags (%d entries) and counter rules (%d tags)",
+    len(HERO_TAGS),
+    len(TAG_COUNTER_ITEMS),
+)
 
 TAG_EXPLANATIONS: Dict[str, str] = {
-    "heavy_magic_damage": "Против сильного магического урона полезен Black King Bar или Pipe of Insight.",
+    "heavy_magic_damage": "Против сильного магического урона полезен Black King Bar, Hood или Pipe of Insight.",
     "hard_disabler": "Дизейблы можно перекрыть Black King Bar, Manta Style или Linken Sphere.",
-    "high_armor_tank": "Танков с высоким броней режут Desolator или Silver Edge.",
+    "high_armor_tank": "Танков с высокой броней режут Desolator или Silver Edge.",
     "initiator": "Против инициаций хороши Linken Sphere или Black King Bar.",
-    "illusion_hero": "Иллюзии удобно чистить с помощью Battle Fury, Mjollnir или Shiva's Guard.",
+    "illusion_hero": "Иллюзии удобно чистить с помощью Battle Fury, Maelstrom, Mjollnir или Shiva's Guard.",
+    "illusionist": "Иллюзии удобно чистить с помощью Battle Fury, Maelstrom, Mjollnir или Shiva's Guard.",
+    "magic_damage": "Много магии — берём BKB, Hood, Pipe или Eternal Shroud.",
+    "physical_damage": "Против физ-урона помогают Ghost Scepter, Crimson Guard или Shiva's Guard.",
+    "mobile": "Подвижных героев ловят Orchid, Bloodthorn, Hex, Gleipnir или Abyssal.",
+    "healer": "Хил режут Spirit Vessel и Shiva's Guard.",
 }
 
 
 def _collect_enemy_tags(enemy_heroes: List[str]) -> Set[str]:
     tags: Set[str] = set()
     for hero in enemy_heroes:
-        tags.update(HERO_TAGS.get(hero, []))
+        hero_tags = HERO_TAGS.get(hero, [])
+        if not hero_tags:
+            logger.debug("Hero %s has no tag mapping; using placeholder", hero)
+        tags.update(hero_tags)
     return tags
 
 
@@ -65,6 +83,12 @@ def get_recommendations(
     enemy_tags = _collect_enemy_tags(enemy_heroes)
     recommended_items = _aggregate_items(enemy_tags, owned_items=my_items)
     explanations = _build_explanations(enemy_tags, recommended_items)
+    logger.info(
+        "Recommendations built: hero=%s, enemy_tags=%s, recommended=%s",
+        my_hero,
+        sorted(enemy_tags),
+        recommended_items,
+    )
     return {
         "recommended_items": recommended_items,
         "explanations": explanations,
