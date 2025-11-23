@@ -1,0 +1,868 @@
+{
+  "antimage": [
+    "agility",
+    "carry",
+    "escape",
+    "nuker"
+  ],
+  "axe": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "strength"
+  ],
+  "bane": [
+    "disabler",
+    "durable",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "bloodseeker": [
+    "agility",
+    "carry",
+    "disabler",
+    "initiator",
+    "nuker"
+  ],
+  "crystal_maiden": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "drow_ranger": [
+    "agility",
+    "carry",
+    "disabler",
+    "pusher"
+  ],
+  "earthshaker": [
+    "disabler",
+    "initiator",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "juggernaut": [
+    "agility",
+    "carry",
+    "escape",
+    "pusher"
+  ],
+  "mirana": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "nuker",
+    "support"
+  ],
+  "morphling": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "nuker"
+  ],
+  "nevermore": [
+    "agility",
+    "carry",
+    "nuker"
+  ],
+  "phantom_lancer": [
+    "agility",
+    "carry",
+    "escape",
+    "nuker",
+    "pusher"
+  ],
+  "puck": [
+    "disabler",
+    "escape",
+    "initiator",
+    "intelligence",
+    "nuker"
+  ],
+  "pudge": [
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "razor": [
+    "agility",
+    "carry",
+    "durable",
+    "nuker",
+    "pusher"
+  ],
+  "sand_king": [
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "storm_spirit": [
+    "carry",
+    "disabler",
+    "escape",
+    "initiator",
+    "intelligence",
+    "nuker"
+  ],
+  "sven": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "tiny": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "pusher",
+    "strength"
+  ],
+  "vengefulspirit": [
+    "agility",
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "support"
+  ],
+  "windrunner": [
+    "carry",
+    "disabler",
+    "escape",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "zuus": [
+    "carry",
+    "intelligence",
+    "nuker"
+  ],
+  "kunkka": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "lina": [
+    "carry",
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "lion": [
+    "disabler",
+    "initiator",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "shadow_shaman": [
+    "disabler",
+    "initiator",
+    "intelligence",
+    "nuker",
+    "pusher",
+    "support"
+  ],
+  "slardar": [
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "strength"
+  ],
+  "tidehunter": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "witch_doctor": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "lich": [
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "riki": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape"
+  ],
+  "enigma": [
+    "disabler",
+    "initiator",
+    "pusher",
+    "universal"
+  ],
+  "tinker": [
+    "carry",
+    "intelligence",
+    "nuker",
+    "pusher"
+  ],
+  "sniper": [
+    "agility",
+    "carry",
+    "nuker"
+  ],
+  "necrolyte": [
+    "carry",
+    "disabler",
+    "durable",
+    "intelligence",
+    "nuker"
+  ],
+  "warlock": [
+    "disabler",
+    "initiator",
+    "intelligence",
+    "support"
+  ],
+  "beastmaster": [
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "universal"
+  ],
+  "queenofpain": [
+    "carry",
+    "escape",
+    "intelligence",
+    "nuker"
+  ],
+  "venomancer": [
+    "disabler",
+    "initiator",
+    "nuker",
+    "pusher",
+    "support",
+    "universal"
+  ],
+  "faceless_void": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "initiator"
+  ],
+  "skeleton_king": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "strength",
+    "support"
+  ],
+  "death_prophet": [
+    "carry",
+    "disabler",
+    "nuker",
+    "pusher",
+    "universal"
+  ],
+  "phantom_assassin": [
+    "agility",
+    "carry",
+    "escape"
+  ],
+  "pugna": [
+    "intelligence",
+    "nuker",
+    "pusher"
+  ],
+  "templar_assassin": [
+    "agility",
+    "carry",
+    "escape"
+  ],
+  "viper": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable",
+    "initiator"
+  ],
+  "luna": [
+    "agility",
+    "carry",
+    "nuker",
+    "pusher"
+  ],
+  "dragon_knight": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "pusher",
+    "strength"
+  ],
+  "dazzle": [
+    "disabler",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "rattletrap": [
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "leshrac": [
+    "carry",
+    "disabler",
+    "intelligence",
+    "nuker",
+    "pusher",
+    "support"
+  ],
+  "furion": [
+    "carry",
+    "escape",
+    "nuker",
+    "pusher",
+    "universal"
+  ],
+  "life_stealer": [
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "strength"
+  ],
+  "dark_seer": [
+    "disabler",
+    "escape",
+    "initiator",
+    "intelligence"
+  ],
+  "clinkz": [
+    "agility",
+    "carry",
+    "escape",
+    "pusher"
+  ],
+  "omniknight": [
+    "durable",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "enchantress": [
+    "disabler",
+    "durable",
+    "intelligence",
+    "pusher",
+    "support"
+  ],
+  "huskar": [
+    "carry",
+    "durable",
+    "initiator",
+    "strength"
+  ],
+  "night_stalker": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "broodmother": [
+    "agility",
+    "carry",
+    "escape",
+    "nuker",
+    "pusher"
+  ],
+  "bounty_hunter": [
+    "agility",
+    "escape",
+    "nuker"
+  ],
+  "weaver": [
+    "agility",
+    "carry",
+    "escape"
+  ],
+  "jakiro": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "pusher",
+    "support"
+  ],
+  "batrider": [
+    "disabler",
+    "escape",
+    "initiator",
+    "universal"
+  ],
+  "chen": [
+    "intelligence",
+    "pusher",
+    "support"
+  ],
+  "spectre": [
+    "carry",
+    "durable",
+    "escape",
+    "universal"
+  ],
+  "ancient_apparition": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "doom_bringer": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "ursa": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable"
+  ],
+  "spirit_breaker": [
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "strength"
+  ],
+  "gyrocopter": [
+    "agility",
+    "carry",
+    "disabler",
+    "nuker"
+  ],
+  "alchemist": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "invoker": [
+    "carry",
+    "disabler",
+    "escape",
+    "intelligence",
+    "nuker",
+    "pusher"
+  ],
+  "silencer": [
+    "carry",
+    "disabler",
+    "initiator",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "obsidian_destroyer": [
+    "carry",
+    "disabler",
+    "intelligence",
+    "nuker"
+  ],
+  "lycan": [
+    "carry",
+    "durable",
+    "escape",
+    "pusher",
+    "strength"
+  ],
+  "brewmaster": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "universal"
+  ],
+  "shadow_demon": [
+    "disabler",
+    "initiator",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "lone_druid": [
+    "agility",
+    "carry",
+    "durable",
+    "pusher"
+  ],
+  "chaos_knight": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "pusher",
+    "strength"
+  ],
+  "meepo": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "pusher"
+  ],
+  "treant": [
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "strength",
+    "support"
+  ],
+  "ogre_magi": [
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "undying": [
+    "disabler",
+    "durable",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "rubick": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "disruptor": [
+    "disabler",
+    "initiator",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "nyx_assassin": [
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "universal"
+  ],
+  "naga_siren": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "initiator",
+    "pusher",
+    "support"
+  ],
+  "keeper_of_the_light": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "wisp": [
+    "escape",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "visage": [
+    "disabler",
+    "durable",
+    "nuker",
+    "pusher",
+    "support",
+    "universal"
+  ],
+  "slark": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "nuker"
+  ],
+  "medusa": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable"
+  ],
+  "troll_warlord": [
+    "agility",
+    "carry",
+    "disabler",
+    "durable",
+    "pusher"
+  ],
+  "centaur": [
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "magnataur": [
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "universal"
+  ],
+  "shredder": [
+    "durable",
+    "escape",
+    "nuker",
+    "strength"
+  ],
+  "bristleback": [
+    "carry",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "tusk": [
+    "disabler",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "skywrath_mage": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "abaddon": [
+    "carry",
+    "durable",
+    "support",
+    "universal"
+  ],
+  "elder_titan": [
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "legion_commander": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "techies": [
+    "disabler",
+    "nuker",
+    "universal"
+  ],
+  "ember_spirit": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker"
+  ],
+  "earth_spirit": [
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "nuker",
+    "strength"
+  ],
+  "abyssal_underlord": [
+    "disabler",
+    "durable",
+    "escape",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "terrorblade": [
+    "agility",
+    "carry",
+    "nuker",
+    "pusher"
+  ],
+  "phoenix": [
+    "disabler",
+    "escape",
+    "initiator",
+    "nuker",
+    "strength",
+    "support"
+  ],
+  "oracle": [
+    "disabler",
+    "escape",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "winter_wyvern": [
+    "disabler",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "arc_warden": [
+    "carry",
+    "escape",
+    "nuker",
+    "universal"
+  ],
+  "monkey_king": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape",
+    "initiator"
+  ],
+  "dark_willow": [
+    "disabler",
+    "escape",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "pangolier": [
+    "carry",
+    "disabler",
+    "durable",
+    "escape",
+    "initiator",
+    "nuker",
+    "universal"
+  ],
+  "grimstroke": [
+    "disabler",
+    "escape",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "hoodwink": [
+    "agility",
+    "disabler",
+    "escape",
+    "nuker",
+    "support"
+  ],
+  "void_spirit": [
+    "carry",
+    "disabler",
+    "escape",
+    "nuker",
+    "universal"
+  ],
+  "snapfire": [
+    "disabler",
+    "escape",
+    "nuker",
+    "support",
+    "universal"
+  ],
+  "mars": [
+    "carry",
+    "disabler",
+    "durable",
+    "initiator",
+    "strength"
+  ],
+  "ringmaster": [
+    "disabler",
+    "escape",
+    "intelligence",
+    "nuker",
+    "support"
+  ],
+  "dawnbreaker": [
+    "carry",
+    "durable",
+    "strength"
+  ],
+  "marci": [
+    "carry",
+    "disabler",
+    "escape",
+    "initiator",
+    "support",
+    "universal"
+  ],
+  "primal_beast": [
+    "disabler",
+    "durable",
+    "initiator",
+    "strength"
+  ],
+  "muerta": [
+    "carry",
+    "disabler",
+    "intelligence",
+    "nuker"
+  ],
+  "kez": [
+    "agility",
+    "carry",
+    "disabler",
+    "escape"
+  ]
+}
